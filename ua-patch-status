@@ -109,29 +109,23 @@ if __name__ == "__main__":
     is_release_expired, expiry_year, expiry_month = check_expired(distrib_codename)
 
     all_origins = set()
+    origins_by_package = {}
     for pkg in cache:
         if not pkg.is_installed:
             continue
         pkgname = pkg.name
 
-        print_debug("available versions for %s" % pkgname)
+        pkg_sites = []
 
-        pkg_origins = set()
+        origins_by_package[pkgname] = set()
         for ver in pkg.versions:
-            origin_str = origins_for(ver)
-            # TODO need to handle unavailable
-            if ver == pkg.candidate and ver == pkg.installed:
-                print_debug(" %s (installed) from %s" % (ver, origin_str))
-            elif ver == pkg.candidate:
-                print_debug(" %s (upgradable) from %s" % (ver, origin_str))
-            else:
-                print_debug(" %s (available) from %s" % (ver, origin_str))
-
             # Loop through origins and store all of them. The idea here is that
             # we don't care where the installed package comes from, provided
             # there is at least one repository we identify as being
             # security-assured under either LTS or ESM.
             for origin in ver.origins:
+                if not origin.site:
+                    continue
                 site = trim_site(origin.site)
                 archive = origin.archive
                 component = origin.component
@@ -139,38 +133,51 @@ if __name__ == "__main__":
                 if not site:
                      continue
                 all_origins.add(t)
-                pkg_origins.add(t)
+                origins_by_package[pkgname].add(t)
 
-        # This tracks suites we care about. Sadly, it appears that the way apt
-        # stores origins truncates away the path that comes after the
-        # domainname in the site portion, or maybe I am just clueless, but
-        # there's no way to tell FIPS apart from ESM, for instance.
-        # See 00REPOS.txt for examples
+            if DEBUG:
+                pkg_sites.append("%s %s/%s"% (site, archive, component))
 
-        # TODO Need to handle:
-        #   MAAS, lxd, juju PPAs
-        #   other PPAs
-        #   other repos
+        print_debug("available versions for %s" % pkgname)
+        print_debug(",".join(pkg_sites))
 
-        # TODO handle restricted, multiverse
-        suite_main = ("archive.ubuntu.com", distrib_codename, "main")
-        suite_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
-        suite_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
-        suite_security = ("security.ubuntu.com", distrib_codename + "-security", "main")
+    # This tracks suites we care about. Sadly, it appears that the way apt
+    # stores origins truncates away the path that comes after the
+    # domainname in the site portion, or maybe I am just clueless, but
+    # there's no way to tell FIPS apart from ESM, for instance.
+    # See 00REPOS.txt for examples
 
-        suite_universe = ("archive.ubuntu.com", distrib_codename, "universe")
-        suite_universe_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "universe")
-        suite_esm_main = ("esm.ubuntu.com", "%s-infra-updates" % distrib_codename, "main")
-        suite_esm_main_security = ("esm.ubuntu.com", "%s-infra-security" % distrib_codename, "main")
-        suite_esm_universe = ("esm.ubuntu.com", "%s-apps-updates" % distrib_codename, "main")
-        suite_esm_universe_security = ("esm.ubuntu.com", "%s-apps-security" % distrib_codename, "main")
+    # TODO Need to handle:
+    #   MAAS, lxd, juju PPAs
+    #   other PPAs
+    #   other repos
+
+    # TODO handle restricted, multiverse
+    suite_main = ("archive.ubuntu.com", distrib_codename, "main")
+    suite_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
+    suite_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
+    suite_security = ("security.ubuntu.com", distrib_codename + "-security", "main")
+
+    suite_universe = ("archive.ubuntu.com", distrib_codename, "universe")
+    suite_universe_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "universe")
+    suite_esm_main = ("esm.ubuntu.com", "%s-infra-updates" % distrib_codename, "main")
+    suite_esm_main_security = ("esm.ubuntu.com", "%s-infra-security" % distrib_codename, "main")
+    suite_esm_universe = ("esm.ubuntu.com", "%s-apps-updates" % distrib_codename, "main")
+    suite_esm_universe_security = ("esm.ubuntu.com", "%s-apps-security" % distrib_codename, "main")
+
+    is_esm_main_enabled = (suite_esm_main in all_origins) or (suite_esm_main_security in all_origins)
+    is_esm_universe_enabled = (suite_esm_universe in all_origins) or (suite_esm_universe_security in all_origins)
+
+    # Now do the final loop through
+    for pkg in cache:
+        if not pkg.is_installed:
+            continue
+        pkgname = pkg.name
+        pkg_origins = origins_by_package[pkgname]
 
         # This set of is_* booleans tracks specific situations we care about in
         # the logic below; for instance, if the package has a main origin, or
         # if the esm repos are enabled.
-
-        is_esm_main_enabled = (suite_esm_main in all_origins) or (suite_esm_main_security in all_origins)
-        is_esm_universe_enabled = (suite_esm_universe in all_origins) or (suite_esm_universe_security in all_origins)
 
         # Some packages get added only in -updates, I'm looking at you
         # ubuntu-advantage-tools and libdrm-updates
@@ -273,6 +280,6 @@ if __name__ == "__main__":
 
         print("Package sources:")
         for site, archive, component in sorted(all_origins):
-            print("    - %-20s %-20s %s" % (site, archive, component))
+            print("    - %-20s %-25s %s" % (site, archive, component))
 
     
