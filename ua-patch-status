@@ -83,11 +83,17 @@ def get_release_date(dist):
 class PatchStats:
     """Tracks overall patch status
 
-    There are three important flags a package can have:
+    The relationship between archives enabled and whether a patch is eligible
+    for receiving updates is non-trivial. We track here all the important
+    buckets a package can be in:
 
-        1. If it comes from a repository which receives patches
-        2. If it is actively receiving patches
-        3. If it has ever been patched
+        - Whether it is set to expire with no ESM coverage
+        - Whether it is in an archive covered by ESM
+        - Whether it received LTS patches
+        - whether it received ESM patches
+
+    We also track the total packages covered and uncovered, and for the
+    uncovered packages, we track where they originate from.
 
     The Ubuntu main archive receives patches for 5 years.
     Canonical-owned archives (excluding partner) receive patches for 10 years.
@@ -95,12 +101,13 @@ class PatchStats:
     """
     def __init__(self):
         self.total_packages_covered = set()
-        self.packages_expiring_5y = set()
+        self.total_packages_uncovered = set()
+
+        self.packages_expiring = set()
         self.packages_covered_esm = set()
         self.packages_patched_main = set()
         self.packages_patched_esm = set()
 
-        self.total_packages_uncovered = set()
         self.packages_uncovered_esm_universe = set()
         self.packages_uncovered_esm_main = set()
         # TODO no-update FIPS is never patched
@@ -245,13 +252,15 @@ if __name__ == "__main__":
                     patchstats.total_packages_uncovered.add(pkgname)
                     patchstats.packages_uncovered_esm_main.add(pkgname)
                     if is_main_pkg_patched:
+                        # We actually track this, but no output is emitted to
+                        # avoid misleading users
                         patchstats.packages_patched_main.add(pkgname)
             else:
                 patchstats.total_packages_covered.add(pkgname)
                 if not is_esm_main_enabled:
                     # If the release isn't expired, but there is no ESM, warn
                     # users they don't have 10 years
-                    patchstats.packages_expiring_5y.add(pkgname)
+                    patchstats.packages_expiring.add(pkgname)
                 if is_main_pkg_patched:
                     patchstats.packages_patched_main.add(pkgname)
         elif is_universe_pkg_origin:
@@ -286,9 +295,9 @@ if __name__ == "__main__":
         # yet expired; showing LTS patches would give a false sense of security.
         if patchstats.packages_patched_main:
             print("        Patched via LTS: %d" % len(patchstats.packages_patched_main))
-        if patchstats.packages_expiring_5y:
-            print("        ** Expiring on %d/%d: %d" %
-                 (expiry_month, expiry_year, len(patchstats.packages_expiring_5y)))
+        if patchstats.packages_expiring:
+            print("        ** Expiring in %d/%d: %d" %
+                 (expiry_month, expiry_year, len(patchstats.packages_expiring)))
     if patchstats.packages_patched_esm:
         print("        Patched via ESM Assurance: %d" % len(patchstats.packages_patched_esm))
     # TODO Would be nice to say "Assured through %d/%d" here for ESM
