@@ -1,0 +1,247 @@
+#!/usr/bin/python3
+
+# TODO optparse stuff
+DEBUG = False
+VERBOSE = False
+
+import apt
+import csv
+import sys
+import time
+import datetime
+
+from apt.utils import get_maintenance_end_date
+from UpdateManager.Core.utils import twrap, get_dist
+
+wrap_indented = lambda s: twrap(s, subsequent_indent="    ")
+
+def check_expired(dist):
+    release_date = get_release_date(dist)
+    assert release_date
+    # TODO: check if LTS in DISTRIB_DESCRIPTION, otherwise 9 months
+    supported_for_n_month = 5 * 12 
+    now = datetime.datetime.now()
+
+    # mvo: we do not define the end date very precisely
+    #      currently this is why it will just display a end
+    #      range
+    (support_end_year, support_end_month) = get_maintenance_end_date(release_date, supported_for_n_month)
+    # check if the support has ended
+    support_ended = (now.year > support_end_year or
+                     (now.year == support_end_year and now.month > support_end_month))
+    return support_ended, support_end_year, support_end_month
+
+
+def get_release_date(dist):
+    distro_data = '/usr/share/distro-info/ubuntu.csv'
+    release_date = None
+    try:
+        with open(distro_data) as csvfile:
+            csv_reader = csv.DictReader(csvfile)
+            for row in csv_reader:
+                if row['series'] == dist:
+                    release_date = row['release']
+                    break
+    except FileNotFoundError:
+        return None
+
+    if not release_date:
+        return None
+
+    time_t = time.mktime(time.strptime(release_date, '%Y-%m-%d'))
+    release_date = datetime.datetime.fromtimestamp(time_t)
+    return release_date
+
+
+class PatchStats:
+    """Tracks overall patch status
+
+    There are three important flags a package can have:
+
+        1. If it comes from a repository which receives patches
+        2. If it is actively receiving patches
+        3. If it has ever been patched
+
+    The Ubuntu main archive receives patches for 5 years.
+    Canonical-owned archives (excluding partner) receive patches for 10 years.
+        patches for 10 years.
+    """
+    def __init__(self):
+        self.total_packages_covered = set()
+        self.packages_expiring_5y = set()
+        self.packages_covered_esm = set()
+        self.packages_patched_main = set()
+        self.packages_patched_esm = set()
+
+        self.total_packages_uncovered = set()
+        self.packages_uncovered_esm_universe = set()
+        self.packages_uncovered_esm_main = set()
+        # TODO no-update FIPS is never patched
+        self.packages_uncovered_fips = set()
+
+def print_debug(s):
+    if DEBUG:
+        print(s)
+
+def trim_archive(archive):
+    return archive.split("-")[-1]
+
+def trim_site(host):
+    # br.archive.ubuntu.com -> archive.ubuntu.com
+    if host.endswith("archive.ubuntu.com"):
+        return "archive.ubuntu.com"
+    return host
+
+def origins_for(ver: apt.package.Version) -> str:
+    s=[]
+    for origin in ver.origins:
+        if not origin.site:
+            # When the package is installed, site is empty, archive/component are "now/now"
+            continue 
+        site = trim_site(origin.site)
+        s.append("%s %s/%s"% (site, origin.archive, origin.component))
+    return ",".join(s)
+
+
+if __name__ == "__main__":
+    cache = apt.Cache()
+    patchstats = PatchStats()
+    distrib_codename = get_dist()
+    release_expired, expiry_year, expiry_month = check_expired(distrib_codename)
+
+    all_origins = set()
+    for pkg in cache:
+        if not pkg.is_installed:
+            continue
+        pkgname = pkg.name
+
+        print_debug("available versions for %s" % pkgname)
+
+        pkg_origins = set()
+        for ver in pkg.versions:
+            origin_str = origins_for(ver)
+            # TODO need to handle unavailable
+            if ver == pkg.candidate and ver == pkg.installed:
+                print_debug(" %s (installed) from %s" % (ver, origin_str))
+            elif ver == pkg.candidate:
+                print_debug(" %s (upgradable) from %s" % (ver, origin_str))
+            else:
+                print_debug(" %s (available) from %s" % (ver, origin_str))
+
+
+            for origin in ver.origins:
+                site = trim_site(origin.site)
+                archive = origin.archive
+                component = origin.component
+                t = (site, archive, component)
+                if not site:
+                     continue
+                all_origins.add(t)
+                pkg_origins.add(t)
+
+        # TODO Need to handle:
+        #   MAAS, lxd, juju PPAs
+        #   other PPAs
+        #   other repos
+
+        # TODO handle restricted, multiverse
+        match_main = ("archive.ubuntu.com", distrib_codename, "main")
+        match_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
+        match_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
+        match_security = ("security.ubuntu.com", distrib_codename + "-security", "main")
+
+        match_universe = ("archive.ubuntu.com", distrib_codename, "universe")
+        match_esm_main = ("esm.ubuntu.com", "%s-infra-updates" % distrib_codename, "main")
+        match_esm_universe = ("esm.ubuntu.com", "%s-apps-updates" % distrib_codename, "main")
+
+        # Prepare to go cross-eyed. This section basically holds all the
+        # complex logic in deciding which buckets a package has to go into.
+        # There is a lot of complexity that emerges from the simple variations
+        # in archive and suite naming conventions; I've tried to make it as
+        # legible as I can while jet-lagged but it's still hard. -- kiko
+
+        if False: # TODO package has ESM fips origin
+            # TODO package has ESM fips-updates origin: OK
+            # If user has enabled FIPS, but not updates, BAD, but need some
+            # thought on how to display it, as it can't be patched at all
+            pass
+        elif match_main in pkg_origins:
+            if release_expired:
+                if match_esm_main in all_origins:
+                    patchstats.total_packages_covered.add(pkgname)
+                    patchstats.packages_covered_esm.add(pkgname)
+                    if match_esm_main in pkg_origins:
+                        patchstats.packages_patched_esm.add(pkgname)
+                else:
+                    patchstats.total_packages_uncovered.add(pkgname)
+                    patchstats.packages_uncovered_esm_main.add(pkgname)
+                    if (match_main_updates in pkg_origins or
+                        match_main_security in pkg_origins or
+                        match_security in pkg_origins):
+                        patchstats.packages_patched_main.add(pkgname)
+            else:
+                patchstats.total_packages_covered.add(pkgname)
+                patchstats.packages_expiring_5y.add(pkgname)
+                if (match_main_updates in pkg_origins or
+                    match_main_security in pkg_origins or
+                    match_security in pkg_origins):
+                    patchstats.packages_patched_main.add(pkgname)
+        elif match_universe in pkg_origins:
+            if match_esm_universe in all_origins:
+                patchstats.total_packages_covered.add(pkgname)
+                patchstats.packages_covered_esm.add(pkgname)
+                if match_esm_universe in pkg_origins:
+                    patchstats.packages_patched_esm.add(pkgname)
+            else:
+                patchstats.total_packages_uncovered.add(pkgname)
+                patchstats.packages_uncovered_esm_universe.add(pkgname)
+        else:
+            patchstats.total_packages_uncovered.add(pkgname)
+
+    # Outcomes are:
+    #   Packages covered
+    #       Of which M expire in Y years (i.e. Main packages exist, not expired)
+    #       Of which N covered by ESM (i.e. Universe packages exist, apps-security)
+    #       Packages updated
+    #           Of which P have received free updates
+    #           Of which Q have received ESM updates
+    #   Packages uncovered
+    #       Of which R would be covered under ESM U (Universe packages exist, no apps-security)
+    #       Of which S would be covered under ESM I (Main packages exist, 5y expired, no apps-security)
+
+    total_packages = len(patchstats.total_packages_covered) + len(patchstats.total_packages_uncovered)
+    print("Total packages: %d" % total_packages)
+    if patchstats.total_packages_covered:
+        print("    - Security assured: %d" % len(patchstats.total_packages_covered))
+    if patchstats.packages_patched_main:
+        print("        Patched via LTS: %d" % len(patchstats.packages_patched_main))
+    if patchstats.packages_patched_esm:
+        print("        Patched via ESM Assurance: %d" % len(patchstats.packages_patched_esm))
+    if patchstats.packages_expiring_5y:
+        print("        ** Expiring on %d/%d: %d" %
+             (expiry_month, expiry_year, len(patchstats.packages_expiring_5y)))
+    if patchstats.total_packages_uncovered:
+        print("    - No assurance: %d" % len(patchstats.total_packages_uncovered))
+    if patchstats.packages_uncovered_esm_universe:
+        print("        ** ESM Assurance (Universe) available for: %d" % len(patchstats.packages_uncovered_esm_universe))
+    if patchstats.packages_uncovered_esm_main:
+        print("        ** ESM Assurance (Main) available for: %d" % len(patchstats.packages_uncovered_esm_main))
+
+    if VERBOSE:
+        if patchstats.packages_uncovered_esm_main:
+            print("\nCoverable via Security Assurance (Main):\n    %s"
+                 % wrap_indented(" ".join(patchstats.packages_uncovered_esm_main)))
+        if patchstats.packages_uncovered_esm_universe:
+            print("\nCoverable via Security Assurance (Universe):\n    %s"
+                 % wrap_indented(" ".join(patchstats.packages_uncovered_esm_universe)))
+        not_coverable = (patchstats.total_packages_uncovered - 
+                         patchstats.packages_uncovered_esm_universe -
+                         patchstats.packages_uncovered_esm_main)
+        if not_coverable:
+            print("\nNot coverable:\n    %s" % wrap_indented(" ".join(not_coverable)))
+
+        print("Package sources:")
+        for site, archive, component in sorted(all_origins):
+            print("    - %-20s %-20s %s" % (site, archive, component))
+
+    
