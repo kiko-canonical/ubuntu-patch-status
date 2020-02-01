@@ -1,0 +1,20 @@
+# This is a manually curated set of repos found in the wild
+
+deb http://archive.ubuntu.com/ubuntu xenial multiverse
+deb http://archive.canonical.com/ubuntu xenial partner
+
+deb https://esm.ubuntu.com/apps/ubuntu bionic-apps-updates main
+deb https://esm.ubuntu.com/infra/ubuntu bionic-infra-security main
+
+deb https://bearer:key@esm.ubuntu.com/fips/ubuntu/ xenial main
+deb https://bearer:key@esm.ubuntu.com/fips-updates/ubuntu/ xenial-updates main
+
+deb https://esm.ubuntu.com/apps/ubuntu bionic-apps-security main
+deb https://esm.ubuntu.com/apps/ubuntu bionic-apps-security main
+deb https://esm.ubuntu.com/infra/ubuntu bionic-infra-security main
+deb https://esm.ubuntu.com/infra/ubuntu bionic-infra-updates main
+deb https://esm.ubuntu.com/fips/ubuntu bionic-infra-updates main
+deb https://esm.ubuntu.com/fips-updates/ubuntu bionic-infra-updates main
+
+deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main
+
