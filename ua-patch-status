@@ -162,6 +162,8 @@ if __name__ == "__main__":
             # there is at least one repository we identify as being
             # security-assured under either LTS or ESM.
             for origin in ver.origins:
+                # TODO: in order to handle FIPS and other archives which have
+                # root-level path names, we'll need to loop over ver.uris instead
                 if not origin.site:
                     continue
                 site = trim_site(origin.site)
