@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 
-# TODO optparse stuff
+# TODO optparse handling and best commandline sys.exit practices
 DEBUG = False
 VERBOSE = False
 
 import apt
 import csv
-import sys
 import time
 import datetime
 
@@ -107,7 +106,7 @@ if __name__ == "__main__":
     cache = apt.Cache()
     patchstats = PatchStats()
     distrib_codename = get_dist()
-    release_expired, expiry_year, expiry_month = check_expired(distrib_codename)
+    is_release_expired, expiry_year, expiry_month = check_expired(distrib_codename)
 
     all_origins = set()
     for pkg in cache:
@@ -128,7 +127,10 @@ if __name__ == "__main__":
             else:
                 print_debug(" %s (available) from %s" % (ver, origin_str))
 
-
+            # Loop through origins and store all of them. The idea here is that
+            # we don't care where the installed package comes from, provided
+            # there is at least one repository we identify as being
+            # security-assured under either LTS or ESM.
             for origin in ver.origins:
                 site = trim_site(origin.site)
                 archive = origin.archive
@@ -139,20 +141,49 @@ if __name__ == "__main__":
                 all_origins.add(t)
                 pkg_origins.add(t)
 
+        # This tracks suites we care about. Sadly, it appears that the way apt
+        # stores origins truncates away the path that comes after the
+        # domainname in the site portion, or maybe I am just clueless, but
+        # there's no way to tell FIPS apart from ESM, for instance.
+        # See 00REPOS.txt for examples
+
         # TODO Need to handle:
         #   MAAS, lxd, juju PPAs
         #   other PPAs
         #   other repos
 
         # TODO handle restricted, multiverse
-        match_main = ("archive.ubuntu.com", distrib_codename, "main")
-        match_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
-        match_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
-        match_security = ("security.ubuntu.com", distrib_codename + "-security", "main")
+        suite_main = ("archive.ubuntu.com", distrib_codename, "main")
+        suite_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
+        suite_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
+        suite_security = ("security.ubuntu.com", distrib_codename + "-security", "main")
 
-        match_universe = ("archive.ubuntu.com", distrib_codename, "universe")
-        match_esm_main = ("esm.ubuntu.com", "%s-infra-updates" % distrib_codename, "main")
-        match_esm_universe = ("esm.ubuntu.com", "%s-apps-updates" % distrib_codename, "main")
+        suite_universe = ("archive.ubuntu.com", distrib_codename, "universe")
+        suite_universe_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "universe")
+        suite_esm_main = ("esm.ubuntu.com", "%s-infra-updates" % distrib_codename, "main")
+        suite_esm_main_security = ("esm.ubuntu.com", "%s-infra-security" % distrib_codename, "main")
+        suite_esm_universe = ("esm.ubuntu.com", "%s-apps-updates" % distrib_codename, "main")
+        suite_esm_universe_security = ("esm.ubuntu.com", "%s-apps-security" % distrib_codename, "main")
+
+        # This set of is_* booleans tracks specific situations we care about in
+        # the logic below; for instance, if the package has a main origin, or
+        # if the esm repos are enabled.
+
+        is_esm_main_enabled = (suite_esm_main in all_origins) or (suite_esm_main_security in all_origins)
+        is_esm_universe_enabled = (suite_esm_universe in all_origins) or (suite_esm_universe_security in all_origins)
+
+        # Some packages get added only in -updates, I'm looking at you
+        # ubuntu-advantage-tools and libdrm-updates
+        is_main_pkg_origin = (suite_main in pkg_origins) or (suite_main_updates in pkg_origins)
+        is_universe_pkg_origin = (suite_universe in pkg_origins) or (suite_universe_updates in pkg_origins)
+
+        # The below isn't technically true for packages that were added in -updates as per above
+        is_main_pkg_patched = ((suite_main_updates in pkg_origins) or 
+                            (suite_main_security in pkg_origins) or
+                            (suite_security in pkg_origins))
+
+        is_esm_main_pkg_origin = (suite_esm_main in pkg_origins) or (suite_esm_main_security in pkg_origins)
+        is_esm_universe_pkg_origin = (suite_esm_universe in pkg_origins) or (suite_esm_universe_security in pkg_origins)
 
         # Prepare to go cross-eyed. This section basically holds all the
         # complex logic in deciding which buckets a package has to go into.
@@ -165,38 +196,31 @@ if __name__ == "__main__":
             # If user has enabled FIPS, but not updates, BAD, but need some
             # thought on how to display it, as it can't be patched at all
             pass
-        elif (match_main in pkg_origins or
-              # Some packages get added only in -updates, I'm looking at you
-              # ubuntu-advantage-tools and libdrm-updates
-              match_main_updates in pkg_origins):
-            if release_expired:
-                if match_esm_main in all_origins:
+        elif is_main_pkg_origin:
+            if is_release_expired:
+                if is_esm_main_enabled:
                     patchstats.total_packages_covered.add(pkgname)
                     patchstats.packages_covered_esm.add(pkgname)
-                    if match_esm_main in pkg_origins:
+                    if is_esm_main_pkg_origin:
                         patchstats.packages_patched_esm.add(pkgname)
                 else:
                     patchstats.total_packages_uncovered.add(pkgname)
                     patchstats.packages_uncovered_esm_main.add(pkgname)
-                    if (match_main_updates in pkg_origins or
-                        match_main_security in pkg_origins or
-                        match_security in pkg_origins):
+                    if is_main_pkg_patched:
                         patchstats.packages_patched_main.add(pkgname)
             else:
                 patchstats.total_packages_covered.add(pkgname)
-                if not match_esm_main in all_origins:
+                if not is_esm_main_enabled:
                     # If the release isn't expired, but there is no ESM, warn
                     # users they don't have 10 years
                     patchstats.packages_expiring_5y.add(pkgname)
-                if (match_main_updates in pkg_origins or
-                    match_main_security in pkg_origins or
-                    match_security in pkg_origins):
+                if is_main_pkg_patched:
                     patchstats.packages_patched_main.add(pkgname)
-        elif match_universe in pkg_origins:
-            if match_esm_universe in all_origins:
+        elif is_universe_pkg_origin:
+            if is_esm_universe_enabled:
                 patchstats.total_packages_covered.add(pkgname)
                 patchstats.packages_covered_esm.add(pkgname)
-                if match_esm_universe in pkg_origins:
+                if is_esm_universe_pkg_origin:
                     patchstats.packages_patched_esm.add(pkgname)
             else:
                 patchstats.total_packages_uncovered.add(pkgname)
@@ -204,7 +228,7 @@ if __name__ == "__main__":
         else:
             patchstats.total_packages_uncovered.add(pkgname)
 
-    # Outcomes are:
+    # Outcomes we care about are:
     #   Packages covered
     #       Of which M expire in Y years (i.e. Main packages exist, not expired)
     #       Of which N covered by ESM (i.e. Universe packages exist, apps-security)
