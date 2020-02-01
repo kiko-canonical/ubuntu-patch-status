@@ -165,7 +165,10 @@ if __name__ == "__main__":
             # If user has enabled FIPS, but not updates, BAD, but need some
             # thought on how to display it, as it can't be patched at all
             pass
-        elif match_main in pkg_origins:
+        elif (match_main in pkg_origins or
+              # Some packages get added only in -updates, I'm looking at you
+              # ubuntu-advantage-tools and libdrm-updates
+              match_main_updates in pkg_origins):
             if release_expired:
                 if match_esm_main in all_origins:
                     patchstats.total_packages_covered.add(pkgname)
