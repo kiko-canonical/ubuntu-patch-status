@@ -14,6 +14,7 @@ from UpdateManager.Core.utils import twrap, get_dist
 
 wrap_indented = lambda s: twrap(s, subsequent_indent="    ")
 
+
 def check_expired(dist):
     release_date = get_release_date(dist)
     assert release_date
@@ -78,18 +79,22 @@ class PatchStats:
         # TODO no-update FIPS is never patched
         self.packages_uncovered_fips = set()
 
+
 def print_debug(s):
     if DEBUG:
         print(s)
 
+
 def trim_archive(archive):
     return archive.split("-")[-1]
+
 
 def trim_site(host):
     # br.archive.ubuntu.com -> archive.ubuntu.com
     if host.endswith("archive.ubuntu.com"):
         return "archive.ubuntu.com"
     return host
+
 
 def origins_for(ver: apt.package.Version) -> str:
     s=[]
