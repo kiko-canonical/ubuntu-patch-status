@@ -1,0 +1,10 @@
+Total packages: 450
+    - Security assured: 450
+        Patched via ESM Assurance: 73
+Package sources:
+    - archive.ubuntu.com   trusty                    main
+    - archive.ubuntu.com   trusty-backports          main
+    - archive.ubuntu.com   trusty-updates            main
+    - esm.ubuntu.com       trusty-infra-security     main
+    - esm.ubuntu.com       trusty-infra-updates      main
+    - security.ubuntu.com  trusty-security           main

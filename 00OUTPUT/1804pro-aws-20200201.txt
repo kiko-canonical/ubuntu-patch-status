@@ -1,0 +1,15 @@
+Total packages: 525
+    - Security assured: 525
+        Patched via LTS: 279
+        Patched via ESM Assurance: 4
+Package sources:
+    - archive.ubuntu.com   bionic                    main
+    - archive.ubuntu.com   bionic                    universe
+    - archive.ubuntu.com   bionic-backports          main
+    - archive.ubuntu.com   bionic-updates            main
+    - archive.ubuntu.com   bionic-updates            universe
+    - esm.ubuntu.com       bionic-apps-security      main
+    - esm.ubuntu.com       bionic-infra-security     main
+    - esm.ubuntu.com       bionic-infra-updates      main
+    - security.ubuntu.com  bionic-security           main
+    - security.ubuntu.com  bionic-security           universe

@@ -1,0 +1,109 @@
+Total packages: 448
+    - No assurance: 448
+        ** ESM Assurance (Main) available for: 448
+
+Coverable via Security Assurance (Main):
+    libestr0 libgpg-error0 python3 libgcc1 liblockfile-bin 
+    readline-common libustr-1.0-1 less resolvconf 
+    python3-problem-report libgpm2 dnsutils python3-update-manager bc 
+    ssh-import-id libdevmapper1.02.1 python-cheetah 
+    linux-image-3.13.0-170-generic libsepol1 vim-common 
+    libdbus-glib-1-2 pppconfig python3-gdbm libpod-latex-perl 
+    libsqlite3-0 update-notifier-common perl-base initscripts 
+    libstdc++6 libpcre3 perl-modules upstart screen python-configobj 
+    liblwres90 ufw liblog-message-simple-perl whiptail 
+    cloud-guest-utils init-system-helpers gzip rsyslog xauth curl 
+    tcpdump apt-xapian-index adduser libp11-kit0 
+    linux-headers-3.13.0-170 libcap2-bin libglib2.0-0 libdb5.3 
+    libpython3.4-minimal libbz2-1.0 ubuntu-advantage-tools patch 
+    libaccountsservice0 libcap2 insserv bzip2 systemd-shim 
+    libdbus-1-3 libwrap0 ethtool pciutils python-prettytable 
+    pollinate libio-string-perl libpolkit-agent-1-0 libsigsegv2 
+    libapparmor1 time dash libcomerr2 passwd libpam-modules 
+    libgirepository-1.0-1 libfribidi0 sysv-rc gir1.2-glib-2.0 
+    sensible-utils libgeoip1 linux-virtual linux-base python3-apt 
+    libtext-soundex-perl xz-utils python2.7 libgck-1-0 eatmydata info 
+    bsdutils grub-common libxdmcp6 busybox-static python3-dbus udev 
+    lsb-release libfuse2 cpio debconf bind9-host python-openssl 
+    libapt-pkg4.12 tasksel-data bash-completion libnih-dbus1 
+    libnfnetlink0 libsub-name-perl wget sudo libsemanage1 libxml2 
+    libfreetype6 libpng12-0 libkrb5-3 libusb-1.0-0 cryptsetup-bin 
+    software-properties-common libkeyutils1 python-yaml grub2-common 
+    ca-certificates libisccfg90 libkmod2 locales python-pam cron at 
+    file libhcrypto4-heimdal libpam-systemd tar gettext-base 
+    apt-transport-https libuuid1 libgnutls-openssl27 tzdata 
+    dosfstools kbd python-pkg-resources python-urllib3 usbutils 
+    python-apt landscape-client bash libgcrypt11 libsigc++-2.0-0c2a 
+    libreadline6 libsystemd-daemon0 libroken18-heimdal ppp 
+    grub-gfxpayload-lists libpython3-stdlib apport-symptoms 
+    base-files libx11-6 libhx509-5-heimdal dpkg mawk libxmuu1 
+    isc-dhcp-client python2.7-minimal libgc1c2 python-pycurl libicu52 
+    ed apport telnet libglib2.0-data libx11-data libjson-c2 
+    libheimbase1-heimdal busybox-initramfs ubuntu-standard 
+    popularity-contest libattr1 module-init-tools 
+    linux-modules-3.13.0-170-generic sed libudev1 python-serial 
+    libtext-iconv-perl update-manager-core libpci3 libapparmor-perl 
+    libcurl3 libmagic1 dmsetup libsystemd-login0 libgssapi3-heimdal 
+    psmisc e2fsprogs lsof sysvinit-utils net-tools policykit-1 
+    libnuma1 apt-utils libklibc python-chardet libtimedate-perl 
+    libxcb1 libprocps3 base-passwd zlib1g python-twisted-bin 
+    uuid-runtime netbase unattended-upgrades python3-newt 
+    libsasl2-modules perl gcc-4.8-base libpopt0 accountsservice 
+    python3-software-properties parted 
+    linux-headers-3.13.0-170-generic libasn1-8-heimdal tasksel tmux 
+    python-gdbm multiarch-support vim-tiny dbus libselinux1 
+    systemd-services libelf1 libkrb5-26-heimdal iso-codes 
+    libpython2.7-minimal python3-distupgrade python-zope.interface 
+    libbind9-90 liblocale-gettext-perl libplymouth2 makedev 
+    libpython-stdlib gnupg python3-gi strace libkrb5support0 
+    initramfs-tools console-setup libwind0-heimdal util-linux 
+    groff-base login libpam-runtime libedit2 python-twisted-names 
+    mlocate python-apt-common fonts-ubuntu-font-family-console 
+    libblkid1 openssh-sftp-server ntpdate lockfile-progs libsasl2-2 
+    klibc-utils gpgv libparted0debian1 librtmp0 vim-runtime nano 
+    libmodule-pluggable-perl procps libncursesw5 libapt-inst1.5 
+    ncurses-base libcurl3-gnutls libpolkit-gobject-1-0 debconf-i18n 
+    libaudit1 ucf language-selector-common xml-core libc6 
+    laptop-detect aptitude-common libmount1 pppoeconf libtasn1-6 
+    libpython2.7-stdlib libasprintf0c2 libss2 mountall 
+    linux-image-virtual libgdbm3 ubuntu-minimal iproute2 findutils 
+    libcap-ng0 command-not-found-data manpages gcc-4.9-base libffi6 
+    libparse-debianchangelog-perl libtinfo5 krb5-locales gawk 
+    libssl1.0.0 python-twisted-core friendly-recovery 
+    libgssapi-krb5-2 python-requests mtr-tiny libpam-cap libslang2 
+    plymouth ncurses-bin openssh-client ifupdown apparmor 
+    libtext-charwidth-perl iptables libgnutls26 python-minimal 
+    bsdmainutils libdebconfclient0 libpython2.7 libacl1 libyaml-0-2 
+    libterm-ui-perl libncurses5 libpam0g libxapian22 lsb-base 
+    dh-python libcgmanager0 cloud-init libk5crypto3 libxext6 kmod 
+    debianutils overlayroot python plymouth-theme-ubuntu-text 
+    linux-headers-virtual libevent-2.0-5 ubuntu-keyring acpid 
+    aptitude libisc95 grub-pc-bin libcryptsetup4 python3.4 openssl 
+    liblockfile1 linux-headers-generic openssh-server 
+    python-json-pointer e2fslibs python3-minimal libpipeline1 
+    mime-support libnih1 geoip-database hdparm libldap-2.4-2 rsync 
+    python3.4-minimal gdisk libclass-accessor-perl libaudit-common 
+    libjson0 lshw netcat-openbsd ureadahead python-debian 
+    command-not-found xkb-data open-vm-tools grep diffutils libexpat1 
+    libgcr-base-3-1 ntfs-3g python3-pycurl irqbalance mount 
+    libgcr-3-common libtext-wrapi18n-perl w3m python-oauth dmidecode 
+    initramfs-tools-bin libc-bin iputils-tracepath python3-apport 
+    libusb-0.1-4 libheimntlm0-heimdal libxtables10 libbsd0 
+    libcwidget3 hostname libept1.4.12 libdns100 ftp 
+    libpam-modules-bin zerofree logrotate libsemanage-common 
+    libsasl2-modules-db libxau6 cryptsetup libboost-iostreams1.54.0 
+    run-one sgml-base eject grub-legacy-ec2 coreutils ltrace 
+    ubuntu-release-upgrader-core libpcap0.8 apt tcpd libmpdec2 
+    landscape-common liblzma5 python-twisted-web os-prober 
+    powermgmt-base libisccc90 libidn11 libarchive-extract-perl 
+    python-jsonpatch python-xapian byobu grub-pc install-info man-db 
+    libpolkit-backend-1-0 libnewt0.52 python-six isc-dhcp-common 
+    keyboard-configuration libdumbnet1 python3-commandnotfound 
+    libpython3.4-stdlib fuse iputils-ping libdrm2 shared-mime-info 
+    libck-connector0 ncurses-term vim 
+
+Package sources:
+    - archive.ubuntu.com   trusty                    main
+    - archive.ubuntu.com   trusty-backports          main
+    - archive.ubuntu.com   trusty-updates            main
+    - security.ubuntu.com  trusty-security           main

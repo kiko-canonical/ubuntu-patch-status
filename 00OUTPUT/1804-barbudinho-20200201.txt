@@ -1,0 +1,78 @@
+Total packages: 2096
+    - Security assured: 1865
+        Patched via LTS: 802
+        ** Expiring in 4/2023: 1865
+    - No assurance: 231
+        ** ESM Assurance (Universe) available for: 221
+
+Coverable via Security Assurance (Universe):
+    libsdl-sound1.2 python3-reportbug libofa0 modem-manager-gui 
+    chromium-browser python-coverage libshine3 python-pyflakes 
+    acpica-tools libavutil55 liblilv-0-0 zoom-player 
+    gstreamer1.0-vaapi libmad0 libsoxr0 libfaad2 libmpcdec6 
+    libswscale4 python-pip-whl i965-va-driver gargoyle-free libbs2b0 
+    libsidplay1v5 libspandsp2 libavcodec57 pyflakes libpangox-1.0-0 
+    libzvbi0 libavdevice57 pcscd python-nevow libsdl2-2.0-0 libzbar0 
+    aeson-pretty hexchat-perl libgsoap-2.8.60 libjpeg9 libdvdread4 
+    libbdplus0 pwgen liba52-0.7.4 android-libboringssl 
+    libgupnp-igd-1.0-4 python3-flake8 python3-invoke 
+    libunicode-linebreak-perl python3-pyflakes xdiskusage libdca0 
+    xinput-calibrator debsums libnice10 libbluray2 libgssdp-1.0-3 
+    mailutils reportbug tlp adb mbr python-pydoctor 
+    python-digitalocean python3-future pdfshuffler tuptime tlp-rdw 
+    modem-manager-gui-help xfonts-100dpi libposix-strptime-perl 
+    chromium-codecs-ffmpeg-extra libsrtp2-1 acpi libmime-charset-perl 
+    libindicator7 python-invoke va-driver-all libavformat57 fig2dev 
+    libimage-size-perl libjs-jquery-throttle-debounce libgsound0 
+    libimage-exiftool-perl python3-pysimplesoap libopenjp2-7 
+    xfonts-75dpi libgme0 gstreamer1.0-libav android-libadb 
+    libqt5x11extras5 libfile-fnmatch-perl libnorm1 libopenmpt0 
+    python-nose libavresample3 python3-wheel 
+    libgstreamer-plugins-bad1.0-0 libxvidcore4 libva2 libpango1.0-0 
+    android-liblog libx265-146 libsombok3 python-pypdf2 pssh freepats 
+    libfltk1.1 libavfilter6 libva-wayland2 libsord-0-0 
+    chromium-browser-l10n fonts-linuxlibertine exfat-utils 
+    libserd-0-0 libpgm-5.2-0 libsoundtouch1 llgal fdupes 
+    hexchat-common libvulkan1 libsndio6.1 libcrystalhd3 libmysofa0 
+    timgm6mb-soundfont python3-coverage libdc1394-22 extlinux 
+    libopenal-data python3-mccabe flake8 libwildmidi-config 
+    python3-mock libccid libchromaprint1 libaacs0 libwildmidi2 
+    libpostproc54 gnome-tweaks hexchat-python3 python3-nose keymon 
+    libgtk2-perl libflite1 libjs-jquery-metadata libvo-amrwbenc0 
+    exfat-fuse libzmq5 libjs-jquery-tablesorter python3-qrcode 
+    libva-drm2 pyflakes3 dconf-editor mesa-va-drivers 
+    python-gobject-2 mailutils-common libx264-152 libkyotocabinet16v5 
+    libgtkglext1 python3-pycodestyle libopencore-amrnb0 key-mon 
+    hexchat gnome-tweak-tool pcsc-tools libappindicator1 
+    libjs-jquery-isonscreen android-libcutils python3-debianbts 
+    python-gtk2 libmpeg2encpp-2.1-0 sshuttle libvo-aacenc0 
+    libzvbi-common python3-pip gstreamer1.0-fluendo-mp3 libjpeg-progs 
+    android-libcrypto-utils libopencore-amrwb0 transfig gnome-clocks 
+    libpango-perl libpcsc-perl python-poppler libmjpegutils-2.1-0 
+    libgupnp-1.0-4 python-jsonpickle fabric python3-nosexcover 
+    libva-x11-2 libmms0 libopenal1 gstreamer1.0-plugins-bad 
+    libde265-0 libgsm1 libgtkspell3-3-0 gocr libsdl-mixer1.2 libntlm0 
+    libfluidsynth1 hexchat-plugins libgsasl7 libmodplug1 
+    libsratom-0-0 intltool python-xlib libmplex2-2.1-0 git-review 
+    android-libbase librubberband2 mosh ffmpeg libdvdnav4 libmikmod3 
+    libkate1 python-epydoc android-sdk-platform-tools-common 
+    acpi-call-dkms gstreamer1.0-plugins-ugly libass9 libmailutils5 
+    libswresample2 jsonlint libmpeg2-4 
+
+
+Not coverable:
+    anydesk unrar virtualbox dropbox ubuntu-restricted-addons 
+    virtualbox-dkms python3-kiwi zoom signal-desktop virtualbox-qt 
+
+Package sources:
+    - archive.ubuntu.com   bionic                    main
+    - archive.ubuntu.com   bionic                    multiverse
+    - archive.ubuntu.com   bionic                    universe
+    - archive.ubuntu.com   bionic-backports          main
+    - archive.ubuntu.com   bionic-updates            main
+    - archive.ubuntu.com   bionic-updates            multiverse
+    - archive.ubuntu.com   bionic-updates            universe
+    - security.ubuntu.com  bionic-security           main
+    - security.ubuntu.com  bionic-security           multiverse
+    - security.ubuntu.com  bionic-security           universe
+    - updates.signal.org   xenial                    main
