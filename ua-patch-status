@@ -184,7 +184,10 @@ if __name__ == "__main__":
                         patchstats.packages_patched_main.add(pkgname)
             else:
                 patchstats.total_packages_covered.add(pkgname)
-                patchstats.packages_expiring_5y.add(pkgname)
+                if not match_esm_main in all_origins:
+                    # If the release isn't expired, but there is no ESM, warn
+                    # users they don't have 10 years
+                    patchstats.packages_expiring_5y.add(pkgname)
                 if (match_main_updates in pkg_origins or
                     match_main_security in pkg_origins or
                     match_security in pkg_origins):
@@ -223,6 +226,7 @@ if __name__ == "__main__":
     if patchstats.packages_expiring_5y:
         print("        ** Expiring on %d/%d: %d" %
              (expiry_month, expiry_year, len(patchstats.packages_expiring_5y)))
+    # TODO Would be nice to say "Assured through %d/%d" here for ESM
     if patchstats.total_packages_uncovered:
         print("    - No assurance: %d" % len(patchstats.total_packages_uncovered))
     if patchstats.packages_uncovered_esm_universe:
