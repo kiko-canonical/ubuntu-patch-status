@@ -2,7 +2,7 @@
 
 # TODO optparse handling and best commandline sys.exit practices
 DEBUG = False
-VERBOSE = False
+VERBOSE = True
 
 import io
 import apt
@@ -193,6 +193,7 @@ if __name__ == "__main__":
     #   other repos
 
     # TODO handle restricted, multiverse
+    # TODO handle partner.c.c
     suite_main = ("archive.ubuntu.com", distrib_codename, "main")
     suite_main_updates = ("archive.ubuntu.com", distrib_codename + "-updates", "main")
     suite_main_security = ("archive.ubuntu.com", distrib_codename + "-security", "main")
