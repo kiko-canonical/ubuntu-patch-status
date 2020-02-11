@@ -18,3 +18,4 @@ deb https://esm.ubuntu.com/fips-updates/ubuntu bionic-infra-updates main
 
 deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main
 
+deb http://archive.canonical.com/ubuntu xenial partner
